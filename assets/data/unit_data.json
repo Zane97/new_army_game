@@ -1,0 +1,22 @@
+{
+"0":  {
+    "unit_type" : "rifleman",
+    "movement_speed" : 150.0,
+    "firing_range" : 250.0,
+    "firing_acrcy" : 0.6,
+    "firing_speed" : 0.2,
+    "bomb_resistance" : 0.2,
+    "armour" : 0.1,
+    "is_defender" : false
+    },
+"1":  {
+    "unit_type" : "sniper",
+    "movement_speed" : 50.0,
+    "firing_range" : 350.0,
+    "firing_acrcy" : 0.95,
+    "firing_speed" : 1.2,
+    "bomb_resistance" : 0.1,
+    "armour" : 0.05,
+    "is_defender" : true
+    }
+} 

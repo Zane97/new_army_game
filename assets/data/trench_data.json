@@ -1,0 +1,15 @@
+{
+"0":    {
+    "trench_name" : "Grassy hill",
+    "range_buff" : 10.0,
+    "armour_buff" : 0.2,
+    "bomb_resistance_buff" : 0.5
+    },
+"1":    {
+    "trench_name" : "Dugout",
+    "range_buff" : 5.0,
+    "armour_buff" : 0.3,
+    "bomb_resistance_buff" : 0.65
+    }
+}
+
