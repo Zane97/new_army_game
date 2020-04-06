@@ -28,5 +28,6 @@ collision_mask = 0
 [node name="range" type="CollisionShape2D" parent="fow"]
 
 [node name="shoot_timer" type="Timer" parent="."]
+one_shot = true
 [connection signal="area_entered" from="fow" to="." method="_on_fow_area_entered"]
 [connection signal="timeout" from="shoot_timer" to="." method="_on_shoot_timer_timeout"]

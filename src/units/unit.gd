@@ -81,7 +81,6 @@ func shoot_at_enemy() -> bool:
 	if areas.size() > 0:
 		if $shoot_timer.is_stopped():
 			shooting_at = areas[randi()%areas.size()]
-			print(shooting_at)
 			$shoot_timer.start(own_data["firing_speed"])
 		return true
 	return false
