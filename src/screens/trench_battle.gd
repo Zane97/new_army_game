@@ -1,4 +1,4 @@
-extends Node2D
+extends Control
 
 """
 Responsible for spawning all the objects, soldiers and trenches that are going
@@ -21,6 +21,7 @@ func _ready():
 	# TESTING
 	randomize()
 	GlobalVaribles.set_lvl_data(0) 
+	GlobalVaribles.trench_amount = 0
 	
 	battle_data = GlobalVaribles.lvl_data
 	screen_x = battle_data["map_size"] * GlobalVaribles.SECTION
@@ -34,7 +35,22 @@ func _ready():
 	load_trenches()
 	load_units()
 	
+	GlobalVaribles.connect("unit_spawn", self, "spawn_unit")
+	
 	GlobalVaribles.trench_battle_ready = true
+
+# Instance a child of unit to the trench_battle sceen
+func spawn_unit(unit_id: int, is_ally: bool, pos: Array = []):
+	if pos.size() == 0:
+		var pos_x = 0 if is_ally else GlobalVaribles.get_screen_size()
+		pos = [pos_x, randf() * (GlobalVaribles.SCREEN_Y - GlobalVaribles.BUTT_HEIGHT)]
+	elif pos.size() == 1:
+		pos = [pos[0], randf() * (GlobalVaribles.SCREEN_Y - GlobalVaribles.BUTT_HEIGHT)]
+	
+	var inst_unit = UNIT_SCN.instance()
+	inst_unit.translate(Vector2(pos[0], pos[1]))
+	$battle_field.add_child(inst_unit)
+	inst_unit.init(unit_id, is_ally)
 
 func trench_at(index:int):
 	if index >= GlobalVaribles.trench_pos.size():
@@ -43,26 +59,14 @@ func trench_at(index:int):
 		return false
 	return GlobalVaribles.trench_pos[index]
 
-# Instance a child of unit to the trench_battle sceen
-func spawn_unit(unit_id: int, is_ally: bool, pos: Array = []):
-	if pos.size() == 0:
-		pos = [randf() * GlobalVaribles.SCREEN_Y, randf() * screen_x]
-	elif pos.size() == 1:
-		pos = [randf() * GlobalVaribles.SCREEN_Y, pos[0]]
-	
-	var inst_unit = UNIT_SCN.instance()
-	inst_unit.translate(Vector2(pos[0], pos[1]))
-	$battle_field.add_child(inst_unit)
-	inst_unit.init(unit_id, is_ally)
-
 # Instance a trench in the correct sector
-func spawn_trench(trench_id: int, section: int):
+func spawn_trench(trench_id: int, section: int, trench_pos: int):
 	var inst_unit = TRENCH_SCN.instance()
 	var pos_x = section * GlobalVaribles.SECTION + GlobalVaribles.OFFSET
 	var pos_y = GlobalVaribles.SCREEN_Y / 2
 	inst_unit.translate(Vector2(pos_x, pos_y))
 	$battle_field.add_child(inst_unit)
-	inst_unit.init(trench_id)
+	inst_unit.init(trench_id, trench_pos)
 
 # Load units from the lvl data
 func load_units():
@@ -83,4 +87,5 @@ func load_trenches():
 		var section = current_trench["trench_section"]
 		
 		GlobalVaribles.trench_pos[section] = true
-		spawn_trench(type_id, section)
+		GlobalVaribles.trench_amount += 1
+		spawn_trench(type_id, section, index)

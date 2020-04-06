@@ -27,8 +27,16 @@ func init(unit_id: int, ally: bool):
 	own_data = GlobalVaribles.get_unit_data_indexed(unit_id).duplicate()
 	is_ally = ally
 	add_salt()
-	current_pos = get_current_pos()
 	setup_fov()
+	
+	current_pos = get_current_pos()
+	if current_pos < 0:
+		target_pos = 0 if is_ally else GlobalVaribles.trench_amount - 1
+	if is_ally and (global_position.x > GlobalVaribles.get_trench_location(target_pos)):
+		target_pos = set_next_trench(global_position.x)
+	if not is_ally and (global_position.x < GlobalVaribles.get_trench_location(target_pos)):
+		target_pos = set_next_trench(global_position.x)
+	
 	has_own_data = true
 
 func _process(delta):
@@ -51,7 +59,7 @@ func _process(delta):
 		trench_range = true
 		var range_buff = get_range_buff()
 		set_fow_shape(range_buff)
-		
+	# remove buffs on trench exit
 	elif current_pos < 0 and trench_range:
 		trench_range = false
 		var range_buff = get_range_buff()
@@ -60,6 +68,7 @@ func _process(delta):
 func _ready():
 	randomize()
 	GlobalVaribles.connect("unit_shoot", self, "shot")
+	GlobalVaribles.connect("trench_skip", self, "skip")
 
 func shot(shot_at, enmy_firing_acrcy):
 	if shot_at == $detection:
@@ -69,6 +78,19 @@ func shot(shot_at, enmy_firing_acrcy):
 			if armour < randf():
 				queue_free()
 
+func skip(index: int, for_ally: bool):
+	if for_ally and is_ally:
+		if index == current_pos:
+			var next_pos = get_next_trench(current_pos)
+			if target_pos != next_pos:
+				target_pos = next_pos
+
+	elif not for_ally and not is_ally:
+		if index == current_pos:
+			var next_pos = get_next_trench(current_pos)
+			if target_pos != next_pos:
+				target_pos = next_pos
+
 func _on_shoot_timer_timeout():
 	GlobalVaribles.emit_signal("unit_shoot", shooting_at, own_data["firing_acrcy"])
 
@@ -77,7 +99,6 @@ func _on_fow_area_entered(area):
 
 func shoot_at_enemy() -> bool:
 	var areas = $fow.get_overlapping_areas()
-	print(areas)
 	if areas.size() > 0:
 		if $shoot_timer.is_stopped():
 			shooting_at = areas[randi()%areas.size()]
@@ -85,19 +106,46 @@ func shoot_at_enemy() -> bool:
 		return true
 	return false
 
-# Return the next trench to which the unit can go
-func get_next_trench(cur_pos: int) -> int:
+# Return the index of the next trench if unit is at trench
+func get_next_trench(cur_pos: int, fall_back: bool = false) -> int:
 	var trench_pos = GlobalVaribles.trench_pos
-	if is_ally:
-		for index in range(cur_pos+1, trench_pos.size()):
+	var out = 0
+	
+	if (is_ally and not fall_back) or (not is_ally and fall_back):
+		for index in range(trench_pos.size()):
 			if trench_pos[index]:
-				return index
+				out += 1
+				if out > cur_pos:
+					return out
 		return trench_pos.size()
-	else:
-		for index in range(cur_pos-1, -1, -1):
+		
+	elif (is_ally and fall_back) or (not is_ally and not fall_back):
+		if cur_pos < 0: cur_pos = GlobalVaribles.get_screen_sections()
+		for index in range(trench_pos.size()-1, -1, -1):
 			if trench_pos[index]:
-				return index
+				out += 1
+				if out > cur_pos:
+					return out
 		return -1
+		
+	return -1
+
+# Returns the next trench based on location
+func set_next_trench(cur_pos: float) -> int:
+	var out: int = 0
+	var trench_pos = GlobalVaribles.trench_pos
+	
+	if is_ally:
+		for index in range(trench_pos.size()):
+			if trench_pos[index]: out += 1
+			if GlobalVaribles.get_trench_location(out) > global_position.x:
+				return out
+	else:
+		for index in range(trench_pos.size()-1, -1, -1):
+			if trench_pos[index]: out += 1
+			if GlobalVaribles.get_trench_location(out) < global_position.x:
+				return out
+	return -1
 
 # Return current trench position if at a trench else -1
 func get_current_pos() -> int:
@@ -116,6 +164,9 @@ func get_current_pos() -> int:
 	return -1
 
 func move(speed: float, delta):
+	# TODO:
+	# if target is < current pos move back and target isnt -1
+	
 	if is_ally:
 		global_position.x += speed * delta
 	else:

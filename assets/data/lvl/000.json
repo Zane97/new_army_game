@@ -31,7 +31,7 @@
         },
         "2" : {
             "unit_type_ID" : 0,
-            "unit_position" : [0, 350],
+            "unit_position" : [50, 350],
             "is_ally" : true
         },
         "3" : {
