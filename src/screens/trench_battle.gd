@@ -42,7 +42,7 @@ func spawn_unit(unit_id: int, is_ally: bool, pos: Array = []):
 	var x_translate = HelperTrenchBattle.get_trench_location(pos[0])
 	inst_unit.translate(Vector2(x_translate, pos[1]))
 	$battle_field.add_child(inst_unit)
-	inst_unit.init(unit_id, is_ally)
+	inst_unit.init(unit_id, is_ally, pos[0])
 
 func trench_at(index:int):
 	if index >= GlobalVaribles.trench_pos.size():

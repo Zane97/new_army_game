@@ -47,6 +47,10 @@ func get_trench_location(trench_index: int) -> float:
 	else:
 		return trench_pos[trench_index]
 
+# Check if unit is within target location
+func is_at_target(trench_index: int, current_pos: float) -> bool:
+	return GlobalVaribles.within_tollerance(trench_pos[trench_index], current_pos)
+
 #######################
 ###     SET GET     ###
 #######################

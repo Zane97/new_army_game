@@ -1,7 +1,7 @@
 {
 "0":  {
     "unit_type" : "rifleman",
-    "movement_speed" : 150.0,
+    "movement_speed" : 5.0,
     "firing_range" : 250.0,
     "firing_acrcy" : 0.6,
     "firing_speed" : 0.2,
@@ -11,7 +11,7 @@
     },
 "1":  {
     "unit_type" : "sniper",
-    "movement_speed" : 50.0,
+    "movement_speed" : 2.0,
     "firing_range" : 350.0,
     "firing_acrcy" : 0.95,
     "firing_speed" : 1.2,

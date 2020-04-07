@@ -4,6 +4,9 @@ extends Node2D
 Note: Gets instanced, should never be placed
 	: init() should be called imediatley after sceen gets added to tree
 
+TODO:
+	Rework and move get_(x)_buff to helper_trench_battle
+
 Controll all the features of a unit like: shooting, moving, waiting at a trench
 
 Each unit has variation in its movment, firing range, firing speed and firing_acrcy 
@@ -16,59 +19,55 @@ export var own_data: Dictionary
 export var has_own_data: bool = false
 export var is_ally:bool
 export var is_shooting:bool = false
-export var current_pos: int = -1
-export var target_pos: int = 1
+export var target_pos: int
+export var at_target: bool
+export var fall_back: bool = false
 
-var trench_range: bool = false
+var has_trench_buff: bool = false
 var shooting_at
 var salt: float = randf() - 0.5
 
-func init(unit_id: int, ally: bool):
+func _ready():
+	randomize()
+	GlobalVaribles.connect("unit_shoot", self, "shot")
+	GlobalVaribles.connect("trench_skip", self, "skip")
+
+func init(unit_id: int, ally: bool, position: int):
 	own_data = GlobalVaribles.get_unit_data_indexed(unit_id).duplicate()
 	is_ally = ally
 	add_salt()
 	setup_fov()
-	
-	current_pos = get_current_pos()
-	if current_pos < 0:
-		target_pos = 0 if is_ally else GlobalVaribles.trench_amount - 1
-	if is_ally and (global_position.x > GlobalVaribles.get_trench_location(target_pos)):
-		target_pos = set_next_trench(global_position.x)
-	if not is_ally and (global_position.x < GlobalVaribles.get_trench_location(target_pos)):
-		target_pos = set_next_trench(global_position.x)
-	
+	target_pos = position
+	at_target = HelperTrenchBattle.is_at_target(target_pos, global_position.x)
 	has_own_data = true
 
 func _process(delta):
-	# TODO:
-	# Check if unit is shooting
 	
-	if not GlobalVaribles.trench_battle_ready:
+	if not HelperTrenchBattle.trench_battle_ready:
 		pass
 	elif not has_own_data:
 		pass
 	elif is_shooting:
 		is_shooting = shoot_at_enemy()
 		pass
-	elif current_pos == -1 or current_pos != target_pos:
-		move(own_data["movement_speed"], delta)
-		current_pos = get_current_pos()
+	elif not at_target:
+		move(own_data["movement_speed"])
+		at_target = HelperTrenchBattle.is_at_target(target_pos, global_position.x)
+	
+	# Remove fall_back if target trench is reached
+	if at_target and fall_back:
+		fall_back = false
 	
 	# apply buffs is at trench
-	if current_pos >= 0 and not trench_range:	
-		trench_range = true
+	if at_target and not has_trench_buff:	
+		has_trench_buff = true
 		var range_buff = get_range_buff()
 		set_fow_shape(range_buff)
 	# remove buffs on trench exit
-	elif current_pos < 0 and trench_range:
-		trench_range = false
+	elif not at_target and has_trench_buff:
+		has_trench_buff = false
 		var range_buff = get_range_buff()
 		set_fow_shape(range_buff)
-	
-func _ready():
-	randomize()
-	GlobalVaribles.connect("unit_shoot", self, "shot")
-	GlobalVaribles.connect("trench_skip", self, "skip")
 
 func shot(shot_at, enmy_firing_acrcy):
 	if shot_at == $detection:
@@ -78,18 +77,15 @@ func shot(shot_at, enmy_firing_acrcy):
 			if armour < randf():
 				queue_free()
 
-func skip(index: int, for_ally: bool):
-	if for_ally and is_ally:
-		if index == current_pos:
-			var next_pos = get_next_trench(current_pos)
-			if target_pos != next_pos:
-				target_pos = next_pos
-
-	elif not for_ally and not is_ally:
-		if index == current_pos:
-			var next_pos = get_next_trench(current_pos)
-			if target_pos != next_pos:
-				target_pos = next_pos
+func skip(index: int, for_ally: bool, is_fallback: bool = false):
+	# Check if unit is in correct army
+	# Check if units target_trench is giving the signal
+	# Check if unit is at target
+	
+	if (for_ally == is_ally) and (target_pos == index) and at_target:
+		var direction = true if is_ally else false
+		direction = not direction if is_fallback else direction
+		target_pos = HelperTrenchBattle.next_target_pos(target_pos, direction)
 
 func _on_shoot_timer_timeout():
 	GlobalVaribles.emit_signal("unit_shoot", shooting_at, own_data["firing_acrcy"])
@@ -106,71 +102,18 @@ func shoot_at_enemy() -> bool:
 		return true
 	return false
 
-# Return the index of the next trench if unit is at trench
-func get_next_trench(cur_pos: int, fall_back: bool = false) -> int:
-	var trench_pos = GlobalVaribles.trench_pos
-	var out = 0
-	
-	if (is_ally and not fall_back) or (not is_ally and fall_back):
-		for index in range(trench_pos.size()):
-			if trench_pos[index]:
-				out += 1
-				if out > cur_pos:
-					return out
-		return trench_pos.size()
-		
-	elif (is_ally and fall_back) or (not is_ally and not fall_back):
-		if cur_pos < 0: cur_pos = GlobalVaribles.get_screen_sections()
-		for index in range(trench_pos.size()-1, -1, -1):
-			if trench_pos[index]:
-				out += 1
-				if out > cur_pos:
-					return out
-		return -1
-		
-	return -1
-
-# Returns the next trench based on location
-func set_next_trench(cur_pos: float) -> int:
-	var out: int = 0
-	var trench_pos = GlobalVaribles.trench_pos
-	
+# Move the unit in the correct direction
+func move(speed: float):	
 	if is_ally:
-		for index in range(trench_pos.size()):
-			if trench_pos[index]: out += 1
-			if GlobalVaribles.get_trench_location(out) > global_position.x:
-				return out
+		if not fall_back: 
+			global_position.x += speed
+		else:
+			global_position.x -= speed
 	else:
-		for index in range(trench_pos.size()-1, -1, -1):
-			if trench_pos[index]: out += 1
-			if GlobalVaribles.get_trench_location(out) < global_position.x:
-				return out
-	return -1
-
-# Return current trench position if at a trench else -1
-func get_current_pos() -> int:
-	var trench_pos = GlobalVaribles.trench_pos
-	var trench_index = 0
-	
-	for index in range(trench_pos.size()):
-		if trench_pos[index]:
-			var trench_translation = index * GlobalVaribles.SECTION
-			trench_translation += GlobalVaribles.OFFSET
-			
-			if GlobalVaribles.within_tollerance(trench_translation, global_position.x):
-				return trench_index
-			
-			trench_index += 1
-	return -1
-
-func move(speed: float, delta):
-	# TODO:
-	# if target is < current pos move back and target isnt -1
-	
-	if is_ally:
-		global_position.x += speed * delta
-	else:
-		global_position.x -= speed * delta
+		if not fall_back:
+			global_position.x -= speed
+		else:
+			global_position.x += speed
 
 # Randomize some stats of the unit
 func add_salt():
@@ -203,10 +146,10 @@ func set_fow_shape(range_buff: float = 0.0):
 
 # returns a arour buff if unit is at trench
 func get_armour_buff() -> float:
-	if trench_range:
+	if at_target:
 		var lvl_data = GlobalVaribles.lvl_data
 		var trenches = lvl_data["trenches"]
-		var trench = trenches[str(current_pos)]
+		var trench = trenches[str(target_pos)]
 		var trench_id = trench["trench_type_ID"]
 		
 		var curr_trench = GlobalVaribles.get_trench_data_indexed(trench_id)
@@ -215,10 +158,10 @@ func get_armour_buff() -> float:
 	return 0.0
 
 func get_range_buff() -> float:
-	if trench_range:
-		var lvl_data = GlobalVaribles.get_lvl_data()
+	if at_target:
+		var lvl_data = GlobalVaribles.lvl_data()
 		var trenches = lvl_data["trenches"]
-		var trench = trenches[str(current_pos)]
+		var trench = trenches[str(target_pos)]
 		var trench_id = trench["trench_type_ID"]
 		
 		var cur_trench = GlobalVaribles.get_trench_data_indexed(trench_id)
@@ -227,10 +170,10 @@ func get_range_buff() -> float:
 	return 0.0
 
 func get_bomb_resistance_buff() -> float:
-	if trench_range:
+	if at_target:
 		var lvl_data = GlobalVaribles.get_lvl_data()
 		var trenches = lvl_data["trenches"]
-		var trench = trenches[str(current_pos)]
+		var trench = trenches[str(target_pos)]
 		var trench_id = trench["trench_type_ID"]
 		
 		var cur_trench = GlobalVaribles.get_trench_data_indexed(trench_id)
