@@ -32,12 +32,12 @@ func _ready():
 	GlobalVaribles.connect("unit_shoot", self, "shot")
 	GlobalVaribles.connect("trench_skip", self, "skip")
 
-func init(unit_id: int, ally: bool, position: int):
+func init(unit_id: int, ally: bool, target_position: int):
 	own_data = GlobalVaribles.get_unit_data_indexed(unit_id).duplicate()
 	is_ally = ally
 	add_salt()
 	setup_fov()
-	target_pos = position
+	target_pos = target_position
 	at_target = HelperTrenchBattle.is_at_target(target_pos, global_position.x)
 	has_own_data = true
 
@@ -86,6 +86,8 @@ func skip(index: int, for_ally: bool, is_fallback: bool = false):
 		var direction = true if is_ally else false
 		direction = not direction if is_fallback else direction
 		target_pos = HelperTrenchBattle.next_target_pos(target_pos, direction)
+		at_target = false
+		fall_back = is_fallback
 
 func _on_shoot_timer_timeout():
 	GlobalVaribles.emit_signal("unit_shoot", shooting_at, own_data["firing_acrcy"])
