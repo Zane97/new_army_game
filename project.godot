@@ -22,6 +22,7 @@ config/icon="res://icon.png"
 
 LoadData="*res://src/auto_load/load_data.gd"
 GlobalVaribles="*res://src/auto_load/global_varibles.gd"
+HelperTrenchBattle="*res://src/auto_load/helper_trench_battle.gd"
 
 [display]
 

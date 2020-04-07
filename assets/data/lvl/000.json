@@ -21,22 +21,27 @@
     "units" : {
         "0" : {
             "unit_type_ID" : 0,
-            "unit_position" : [900, 50],
+            "unit_position" : [1, 50],
             "is_ally" : false
         },
         "1" : {
             "unit_type_ID" : 0,
-            "unit_position" : [700, 250],
+            "unit_position" : [2, 250],
             "is_ally" : false
         },
         "2" : {
             "unit_type_ID" : 0,
-            "unit_position" : [50, 350],
+            "unit_position" : [0, 350],
             "is_ally" : true
         },
         "3" : {
             "unit_type_ID" : 0,
             "unit_position" : [0, 50],
+            "is_ally" : true
+        },
+        "4" : {
+            "unit_type_ID" : -1,
+            "unit_position" : [0, 40],
             "is_ally" : true
         }
         }

@@ -9,46 +9,38 @@ const UNIT_SCN = preload("res://src/units/unit.tscn")
 const TRENCH_SCN = preload("res://src/objects/trench.tscn")
 
 var battle_data: Dictionary
-var screen_x: float
 
 func _ready():
 	#TODO
-	#restrict camera movement to screen_x
+	#restrict camera movement to map_size(helper_trench_battle)
 	#change map background to map type
 	#spawn objects
-	#set trench_battle_ready to true
 	
-	# TESTING
-	randomize()
+	# TESTING, lvl_data should be set before trenchbatle is instance
 	GlobalVaribles.set_lvl_data(0) 
-	GlobalVaribles.trench_amount = 0
 	
+	randomize()
 	battle_data = GlobalVaribles.lvl_data
-	screen_x = battle_data["map_size"] * GlobalVaribles.SECTION
-	
-	GlobalVaribles.trench_pos = []
-	for i in range(battle_data["map_size"]):
-		var temp = GlobalVaribles.trench_pos
-		temp.append(false)
-		GlobalVaribles.trench_pos = temp
+	HelperTrenchBattle.init(battle_data["map_size"], battle_data["trenches"])
 	
 	load_trenches()
 	load_units()
 	
 	GlobalVaribles.connect("unit_spawn", self, "spawn_unit")
 	
-	GlobalVaribles.trench_battle_ready = true
+	HelperTrenchBattle.trench_battle_ready = true
 
 # Instance a child of unit to the trench_battle sceen
 func spawn_unit(unit_id: int, is_ally: bool, pos: Array = []):
 	if pos.size() == 0:
-		var pos_x = 0 if is_ally else GlobalVaribles.get_screen_size()
-		pos = [pos_x, randf() * (GlobalVaribles.SCREEN_Y - GlobalVaribles.BUTT_HEIGHT)]
+		var pos_x = 0 if is_ally else HelperTrenchBattle.trench_size
+		pos = [pos_x, randf() * (GlobalVaribles.BATTLEFIELD_HEIGHT)]
 	elif pos.size() == 1:
-		pos = [pos[0], randf() * (GlobalVaribles.SCREEN_Y - GlobalVaribles.BUTT_HEIGHT)]
+		pos = [pos[0], randf() * (GlobalVaribles.BATTLEFIELD_HEIGHT)]
 	
 	var inst_unit = UNIT_SCN.instance()
-	inst_unit.translate(Vector2(pos[0], pos[1]))
+	var x_translate = HelperTrenchBattle.get_trench_location(pos[0])
+	inst_unit.translate(Vector2(x_translate, pos[1]))
 	$battle_field.add_child(inst_unit)
 	inst_unit.init(unit_id, is_ally)
 
@@ -60,13 +52,13 @@ func trench_at(index:int):
 	return GlobalVaribles.trench_pos[index]
 
 # Instance a trench in the correct sector
-func spawn_trench(trench_id: int, section: int, trench_pos: int):
+func spawn_trench(trench_id: int, trench_pos: int):
 	var inst_unit = TRENCH_SCN.instance()
-	var pos_x = section * GlobalVaribles.SECTION + GlobalVaribles.OFFSET
-	var pos_y = GlobalVaribles.SCREEN_Y / 2
+	var pos_x = HelperTrenchBattle.get_trench_location(trench_pos)
+	var pos_y = GlobalVaribles.BATTLEFIELD_HEIGHT / 2
 	inst_unit.translate(Vector2(pos_x, pos_y))
 	$battle_field.add_child(inst_unit)
-	inst_unit.init(trench_id, trench_pos)
+	inst_unit.init(trench_id)
 
 # Load units from the lvl data
 func load_units():
@@ -84,8 +76,5 @@ func load_trenches():
 	for index in range(trenches.size()):
 		var current_trench = trenches[str(index)]
 		var type_id = current_trench["trench_type_ID"]
-		var section = current_trench["trench_section"]
 		
-		GlobalVaribles.trench_pos[section] = true
-		GlobalVaribles.trench_amount += 1
-		spawn_trench(type_id, section, index)
+		spawn_trench(type_id, index)
