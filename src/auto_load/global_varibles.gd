@@ -15,6 +15,7 @@ const BATTLEFIELD_HEIGHT = SCREEN_Y - BUTT_HEIGHT
 const SECTION = 200.0
 const OFFSET = 300.0
 const TOLLERANCE = 5.0
+const MIN_RANGE_MULTI = 0.3
 
 var trench_data: Dictionary setget ,get_trench_data
 var unit_data: Dictionary setget ,get_unit_data

@@ -22,6 +22,7 @@ func _ready():
 	randomize()
 	battle_data = GlobalVaribles.lvl_data
 	HelperTrenchBattle.init(battle_data["map_size"], battle_data["trenches"])
+	HelperTrenchBattle.gen_shapes()
 	
 	load_trenches()
 	load_units()
@@ -83,3 +84,11 @@ func load_trenches():
 		var type_id = current_trench["trench_type_ID"]
 		
 		spawn_trench(type_id, index)
+
+
+
+
+
+
+
+
