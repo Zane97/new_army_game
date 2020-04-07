@@ -159,7 +159,7 @@ func get_armour_buff() -> float:
 
 func get_range_buff() -> float:
 	if at_target:
-		var lvl_data = GlobalVaribles.lvl_data()
+		var lvl_data = GlobalVaribles.lvl_data
 		var trenches = lvl_data["trenches"]
 		var trench = trenches[str(target_pos)]
 		var trench_id = trench["trench_type_ID"]

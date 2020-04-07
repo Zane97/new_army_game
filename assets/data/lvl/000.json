@@ -40,8 +40,8 @@
             "is_ally" : true
         },
         "4" : {
-            "unit_type_ID" : -1,
-            "unit_position" : [0, 40],
+            "unit_type_ID" : 0,
+            "unit_position" : [0, 150],
             "is_ally" : true
         }
         }

@@ -32,11 +32,16 @@ func _ready():
 
 # Instance a child of unit to the trench_battle sceen
 func spawn_unit(unit_id: int, is_ally: bool, pos: Array = []):
+	var target_pos: int
 	if pos.size() == 0:
-		var pos_x = 0 if is_ally else HelperTrenchBattle.trench_size
+		var pos_x = -1 if is_ally else HelperTrenchBattle.trench_size
 		pos = [pos_x, randf() * (GlobalVaribles.BATTLEFIELD_HEIGHT)]
+		target_pos = 0
 	elif pos.size() == 1:
 		pos = [pos[0], randf() * (GlobalVaribles.BATTLEFIELD_HEIGHT)]
+		target_pos = pos[0]
+	else:
+		target_pos = pos[0]
 	
 	var inst_unit = UNIT_SCN.instance()
 	var x_translate = HelperTrenchBattle.get_trench_location(pos[0])
@@ -58,7 +63,7 @@ func spawn_trench(trench_id: int, trench_pos: int):
 	var pos_y = GlobalVaribles.BATTLEFIELD_HEIGHT / 2
 	inst_unit.translate(Vector2(pos_x, pos_y))
 	$battle_field.add_child(inst_unit)
-	inst_unit.init(trench_id)
+	inst_unit.init(trench_id, trench_pos)
 
 # Load units from the lvl data
 func load_units():
