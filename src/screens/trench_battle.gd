@@ -10,9 +10,12 @@ const TRENCH_SCN = preload("res://src/objects/trench.tscn")
 
 var battle_data: Dictionary
 
+var battle_timer: float
+var _player_cash: int = 500
+var _ai_cash: int = 750
+
 func _ready():
 	#TODO
-	#restrict camera movement to map_size(helper_trench_battle)
 	#change map background to map type
 	#spawn objects
 	
@@ -32,10 +35,22 @@ func _ready():
 	
 	GlobalVaribles.connect("unit_spawn", self, "spawn_unit")
 	
+	battle_timer = 0
 	HelperTrenchBattle.trench_battle_ready = true
 
+func _process(delta):
+	battle_timer += delta
+	$gui/player_data/time.text = "TIME: " + str(int(battle_timer))
+	$gui/player_data/cash.text = "CASH: " + str(_player_cash)
+
 # Instance a child of unit to the trench_battle sceen
-func spawn_unit(unit_id: int, is_ally: bool, pos: Array = []):
+func spawn_unit(unit_id: int, is_ally: bool, cost: int = 0, pos: Array = []) -> bool:
+	if can_unit_spawn(is_ally, cost):
+		_player_cash -= cost if is_ally else 0
+		_ai_cash -= cost if not is_ally else 0
+	else:
+		return false
+	
 	var target_pos: int
 	if pos.size() == 0:
 		var pos_x = -1 if is_ally else HelperTrenchBattle.trench_size
@@ -52,6 +67,7 @@ func spawn_unit(unit_id: int, is_ally: bool, pos: Array = []):
 	inst_unit.translate(Vector2(x_translate, pos[1]))
 	$battle_field.add_child(inst_unit)
 	inst_unit.init(unit_id, is_ally, target_pos)
+	return true
 
 func trench_at(index:int):
 	if index >= GlobalVaribles.trench_pos.size():
@@ -77,7 +93,7 @@ func load_units():
 		var type_id = current_unit["unit_type_ID"]
 		var is_ally = current_unit["is_ally"]
 		var pos = current_unit["unit_position"]
-		spawn_unit(type_id, is_ally, pos)
+		spawn_unit(type_id, is_ally, 0, pos)
 
 # Loads trenches from lvl data
 func load_trenches():
@@ -88,7 +104,12 @@ func load_trenches():
 		
 		spawn_trench(type_id, index)
 
-
+# Check if the unit can be spawend
+func can_unit_spawn(for_ally: bool, unit_cost: int) -> bool:
+	if for_ally:
+		return unit_cost <= _player_cash
+	else:
+		return unit_cost <= _ai_cash
 
 
 

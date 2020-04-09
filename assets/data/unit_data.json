@@ -1,6 +1,7 @@
 {
 "0":  {
     "unit_type" : "rifleman",
+    "cost" : 100,
     "movement_speed" : 5.0,
     "firing_range" : 250.0,
     "firing_acrcy" : 0.6,
@@ -11,6 +12,7 @@
     },
 "1":  {
     "unit_type" : "sniper",
+    "cost" : 300,
     "movement_speed" : 2.0,
     "firing_range" : 350.0,
     "firing_acrcy" : 0.95,
