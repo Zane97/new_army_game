@@ -7,6 +7,7 @@ export(float) var MIN_ZOOM = 0.16
 export(int,"disabled","pinch") var zoom_gesture = 1
 export(int,"disabled","twist") var rotation_gesture = 1
 export(int,"disabled","single_drag","multi_drag") var movement_gesture = 2
+export(int, "both_axis", "x_axis", "y_axis") var movement_axis = 2
 
 func _unhandled_input(e):
 	if (e is InputEventMultiScreenDrag and  movement_gesture == 2
@@ -24,7 +25,12 @@ func camera2global(position):
 	return camera_center + (from_camera_center_pos*zoom).rotated(rotation)
 
 func _move(event):
-	offset -= (event.relative*zoom).rotated(rotation)
+	if movement_axis == 0:
+		offset -= (event.relative*zoom).rotated(rotation)
+	elif movement_axis == 1:
+		offset.x -= (event.relative*zoom).rotated(rotation).x
+	elif movement_axis == 2:
+		offset.y -= (event.relative*zoom).rotated(rotation).y
 	
 func _zoom(event):
 	var li = event.distance

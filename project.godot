@@ -51,6 +51,7 @@ _global_script_class_icons={
 [application]
 
 config/name="Army_Game"
+run/main_scene="res://src/screens/trench_battle.tscn"
 config/icon="res://icon.png"
 
 [autoload]

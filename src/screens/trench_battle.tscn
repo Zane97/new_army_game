@@ -7,12 +7,11 @@
 [node name="trench_battle" type="Node2D"]
 script = ExtResource( 1 )
 
-[node name="battle_field" type="Node2D" parent="."]
-
 [node name="GCC2D" parent="." instance=ExtResource( 4 )]
-position = Vector2( 498.207, 371.005 )
-limit_top = 0
-limit_bottom = 0
+position = Vector2( 504, 376 )
+movement_axis = 1
+
+[node name="battle_field" type="Node2D" parent="."]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
