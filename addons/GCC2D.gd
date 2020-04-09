@@ -20,17 +20,17 @@ func _unhandled_input(e):
 
 # Given a a position on the camera returns to the corresponding global position
 func camera2global(position):
-	var camera_center = global_position + offset
-	var from_camera_center_pos = position - get_camera_center_offset()
+	var camera_center = global_position + position
+	var from_camera_center_pos = position - get_camera_center_position()
 	return camera_center + (from_camera_center_pos*zoom).rotated(rotation)
 
 func _move(event):
 	if movement_axis == 0:
-		offset -= (event.relative*zoom).rotated(rotation)
+		position -= (event.relative*zoom).rotated(rotation)
 	elif movement_axis == 1:
-		offset.x -= (event.relative*zoom).rotated(rotation).x
+		position.x -= (event.relative*zoom).rotated(rotation).x
 	elif movement_axis == 2:
-		offset.y -= (event.relative*zoom).rotated(rotation).y
+		position.y -= (event.relative*zoom).rotated(rotation).y
 	
 func _zoom(event):
 	var li = event.distance
@@ -48,17 +48,17 @@ func _zoom(event):
 		zf = MAX_ZOOM
 		zd = zf - zi
 	
-	var from_camera_center_pos = event.position - get_camera_center_offset()
-	offset -= (from_camera_center_pos*zd).rotated(rotation)
+	var from_camera_center_pos = event.position - get_camera_center_position()
+	position -= (from_camera_center_pos*zd).rotated(rotation)
 	zoom = zf*Vector2.ONE
 
 func _rotate(event):
-	var fccp = (event.position - get_camera_center_offset()) # from_camera_center_pos = fccp
+	var fccp = (event.position - get_camera_center_position()) # from_camera_center_pos = fccp
 	var fccp_op_rot =  -fccp.rotated(event.relative)
-	offset -= ((fccp_op_rot + fccp)*zoom).rotated(rotation-event.relative)
+	position -= ((fccp_op_rot + fccp)*zoom).rotated(rotation-event.relative)
 	rotation -= event.relative
 
-func get_camera_center_offset():
+func get_camera_center_position():
 	if anchor_mode == ANCHOR_MODE_FIXED_TOP_LEFT:
 		return Vector2.ZERO
 	elif anchor_mode ==  ANCHOR_MODE_DRAG_CENTER:

@@ -19,7 +19,7 @@ var shapes: Array
 
 func init(set_map_sections: int, trenches: Dictionary):
 	map_sections = set_map_sections
-	map_size = GlobalVaribles.OFFSET + GlobalVaribles.SECTION * map_sections
+	map_size = GlobalVaribles.OFFSET * 2 + GlobalVaribles.SECTION * map_sections
 	
 	trench_pos = calc_trench_pos(trenches)
 	trench_size = trench_pos.size()

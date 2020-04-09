@@ -24,6 +24,9 @@ func _ready():
 	HelperTrenchBattle.init(battle_data["map_size"], battle_data["trenches"])
 	HelperTrenchBattle.gen_shapes()
 	
+	$GCC2D.limit_left = 0
+	$GCC2D.limit_right = HelperTrenchBattle.map_size
+	
 	load_trenches()
 	load_units()
 	
