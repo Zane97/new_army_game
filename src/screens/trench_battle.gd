@@ -1,4 +1,4 @@
-extends Control
+extends Node2D
 
 """
 Responsible for spawning all the objects, soldiers and trenches that are going

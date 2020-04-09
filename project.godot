@@ -8,9 +8,44 @@
 
 config_version=4
 
-_global_script_classes=[  ]
+_global_script_classes=[ {
+"base": "InputEventAction",
+"class": "InputEventMultiScreenDrag",
+"language": "GDScript",
+"path": "res://addons/Godot-Touch-Input-Manager_v0_5_1/CustomInputEvents/InputEventMultiScreenDrag.gd"
+}, {
+"base": "InputEventAction",
+"class": "InputEventScreenPinch",
+"language": "GDScript",
+"path": "res://addons/Godot-Touch-Input-Manager_v0_5_1/CustomInputEvents/InputEventScreenPinch.gd"
+}, {
+"base": "InputEventAction",
+"class": "InputEventScreenTwist",
+"language": "GDScript",
+"path": "res://addons/Godot-Touch-Input-Manager_v0_5_1/CustomInputEvents/InputEventScreenTwist.gd"
+}, {
+"base": "InputEventAction",
+"class": "InputEventSingleScreenDrag",
+"language": "GDScript",
+"path": "res://addons/Godot-Touch-Input-Manager_v0_5_1/CustomInputEvents/InputEventSingleScreenDrag.gd"
+}, {
+"base": "InputEventAction",
+"class": "InputEventSingleScreenTap",
+"language": "GDScript",
+"path": "res://addons/Godot-Touch-Input-Manager_v0_5_1/CustomInputEvents/InputEventSingleScreenTap.gd"
+}, {
+"base": "InputEventAction",
+"class": "InputEventSingleScreenTouch",
+"language": "GDScript",
+"path": "res://addons/Godot-Touch-Input-Manager_v0_5_1/CustomInputEvents/InputEventSingleScreenTouch.gd"
+} ]
 _global_script_class_icons={
-
+"InputEventMultiScreenDrag": "",
+"InputEventScreenPinch": "",
+"InputEventScreenTwist": "",
+"InputEventSingleScreenDrag": "",
+"InputEventSingleScreenTap": "",
+"InputEventSingleScreenTouch": ""
 }
 
 [application]
@@ -20,6 +55,7 @@ config/icon="res://icon.png"
 
 [autoload]
 
+InputManager="*res://addons/Godot-Touch-Input-Manager_v0_5_1/InputManager.gd"
 LoadData="*res://src/auto_load/load_data.gd"
 GlobalVaribles="*res://src/auto_load/global_varibles.gd"
 HelperTrenchBattle="*res://src/auto_load/helper_trench_battle.gd"
@@ -32,6 +68,10 @@ window/size/test_width=666
 window/size/test_height=500
 window/stretch/mode="2d"
 window/stretch/aspect="keep_height"
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
 
 [layer_names]
 
