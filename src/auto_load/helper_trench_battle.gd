@@ -54,6 +54,11 @@ func get_trench_location(trench_index: int) -> float:
 
 # Check if unit is within target location
 func is_at_target(trench_index: int, current_pos: float) -> bool:
+	print (str(trench_size) + " " + str(trench_index) + " " + str(current_pos))
+	if trench_index >= trench_size:
+		return GlobalVaribles.within_tollerance(map_size, current_pos)
+	if trench_index < 0:
+		return GlobalVaribles.within_tollerance(0, current_pos)
 	return GlobalVaribles.within_tollerance(trench_pos[trench_index], current_pos)
 
 # Generates all the shapes that will be used in this battle

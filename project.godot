@@ -63,8 +63,8 @@ HelperTrenchBattle="*res://src/auto_load/helper_trench_battle.gd"
 
 [display]
 
-window/size/width=1000
-window/size/height=750
+window/size/width=600
+window/size/height=375
 window/size/test_width=666
 window/size/test_height=500
 window/stretch/mode="2d"

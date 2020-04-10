@@ -9,8 +9,8 @@ signal unit_spawn
 signal trench_skip
 
 # getset functions
-const SCREEN_Y = 750.0
-const BUTT_HEIGHT = 100.0
+const SCREEN_Y = 375.0
+const BUTT_HEIGHT = 50.0
 const BATTLEFIELD_HEIGHT = SCREEN_Y - BUTT_HEIGHT
 const SECTION = 200.0
 const OFFSET = 300.0

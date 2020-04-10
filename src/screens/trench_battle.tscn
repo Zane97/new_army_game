@@ -10,8 +10,8 @@ script = ExtResource( 1 )
 [node name="gui" type="CanvasLayer" parent="."]
 
 [node name="unit_spawn" parent="gui" instance=ExtResource( 2 )]
-margin_top = 663.0
-margin_bottom = 3.0
+margin_top = 320.0
+margin_bottom = 1.0
 
 [node name="player_data" type="Control" parent="gui"]
 anchor_right = 1.0
@@ -37,7 +37,7 @@ text = "TIME:
 "
 
 [node name="GCC2D" parent="." instance=ExtResource( 4 )]
-position = Vector2( 504, 376 )
+position = Vector2( 264.834, 187.059 )
 limit_left = 0
 movement_axis = 1
 
